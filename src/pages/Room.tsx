@@ -436,24 +436,8 @@ export const Room: React.FC = () => {
     e?.preventDefault();
     if (!inputMessage.trim() || !stompClient || !isConnected || participant?.isMuted) return;
 
-    // 1. Instant P2P Sync for 'Real Time' feel
-    stompClient.publish({
-      destination: "/app/chat.control",
-      body: JSON.stringify({
-        type: "MESSAGE",
-        roomCode: code,
-        data: {
-          id: Date.now(), // Temp frontend ID
-          content: inputMessage.trim(),
-          senderName: participant?.nickName,
-          senderId: participant?.id,
-          roomCode: code,
-          createdAt: new Date().toISOString()
-        }
-      })
-    });
-
-    // 2. Persistent Backend storage
+    // Send only through backend persistence endpoint.
+    // Backend then broadcasts a single canonical message to everyone.
     stompClient.publish({
       destination: "/app/chat.send",
       body: JSON.stringify({
