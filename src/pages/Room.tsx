@@ -55,8 +55,15 @@ export const Room: React.FC = () => {
   const typingTimeoutRef = useRef<any>(null);
   
   // Timer state
-  const storedExpiresAt = code ? localStorage.getItem(`expiresAt_${code}`) : null;
-  const [expiresAtTarget, setExpiresAtTarget] = useState<string | null>(storedExpiresAt);
+  const rawStoredExpiresAt = code ? localStorage.getItem(`expiresAt_${code}`) : null;
+  // Normalize server-provided LocalDateTime (no timezone) as UTC to avoid instant-expiry issues across timezones
+  const normalizeExpiry = (value: string | null) => {
+    if (!value) return null;
+    // If the string already includes a timezone (Z or +/- offset), keep as-is
+    if (/Z$|[+-]\d{2}:\d{2}$/.test(value)) return value;
+    return `${value}Z`;
+  };
+  const [expiresAtTarget, setExpiresAtTarget] = useState<string | null>(normalizeExpiry(rawStoredExpiresAt));
   const [timeLeft, setTimeLeft] = useState<string>("");
 
   const participantRef = useRef(participant);
@@ -359,7 +366,8 @@ export const Room: React.FC = () => {
            setAdminId(payload.data.id);
         }
         if (payload.data.expiresAt) {
-          setExpiresAtTarget(payload.data.expiresAt);
+          const normalized = normalizeExpiry(payload.data.expiresAt);
+          setExpiresAtTarget(normalized);
           if (code) localStorage.setItem(`expiresAt_${code}`, payload.data.expiresAt);
         }
         break;
