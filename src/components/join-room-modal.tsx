@@ -5,6 +5,7 @@ import { Button } from "./ui/button"
 import { joinRoom } from "../services/api"
 import { useChatStore } from "../store/useChatStore"
 import { Loader2, Eye, EyeOff } from "lucide-react"
+import { getApiErrorMessage } from "../utils/api-error"
 
 interface JoinRoomModalProps {
   open: boolean
@@ -60,7 +61,7 @@ export function JoinRoomModal({ open, onOpenChange }: JoinRoomModalProps) {
       navigate(`/room/${parsedCode}`)
       
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Invalid room code or full room.")
+      setError(getApiErrorMessage(err, "Unable to join room."))
     } finally {
       setIsLoading(false)
     }

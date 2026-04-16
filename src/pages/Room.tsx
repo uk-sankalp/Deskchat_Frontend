@@ -10,6 +10,7 @@ import { fetchOnlineParticipants, fetchMessages, joinRoom, kickUser, muteUser, u
 import { Send, Trash2, Lock, Unlock, Loader2, Copy, Check, Clock, ChevronLeft, Smile, Paperclip, TimerReset, VolumeX, Volume2, Users, UserX, Download } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { BASE_URL } from "../config";
+import { getApiErrorMessage } from "../utils/api-error";
 
 export const Room: React.FC = () => {
   const { code } = useParams<{ code: string }>();
@@ -197,6 +198,7 @@ export const Room: React.FC = () => {
         setMessages([...history].reverse());
       } catch (err) {
         console.error("Room Initialization Error:", err);
+        alert(getApiErrorMessage(err, "Unable to join room."));
         // Recover by taking them back to the lobby if the session is invalid
         navigate('/');
       } finally {

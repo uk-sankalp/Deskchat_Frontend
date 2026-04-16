@@ -5,6 +5,7 @@ import { Button } from "./ui/button"
 import { createRoom, joinRoom } from "../services/api"
 import { useChatStore } from "../store/useChatStore"
 import { Loader2, CheckCircle2, Eye, EyeOff } from "lucide-react"
+import { getApiErrorMessage } from "../utils/api-error"
 
 interface CreateRoomModalProps {
   open: boolean
@@ -87,7 +88,7 @@ export function CreateRoomModal({ open, onOpenChange }: CreateRoomModalProps) {
       setSuccess(true)
       
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to create room.")
+      setError(getApiErrorMessage(err, "Failed to create room."))
       setIsLoading(false)
     }
   }
